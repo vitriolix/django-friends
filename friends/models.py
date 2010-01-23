@@ -109,7 +109,7 @@ INVITE_STATUS = (
 
 class JoinInvitationManager(models.Manager):
     
-    def send_invitation(self, from_user, to_email, message):
+    def send_invitation(self, from_user, to_email, message, subject_template="friends/join_invite_subject.txt", message_template="friends/join_invite_message.txt"):
         contact, created = Contact.objects.get_or_create(email=to_email, user=from_user)
         salt = sha_constructor(str(random())).hexdigest()[:5]
         confirmation_key = sha_constructor(salt + to_email).hexdigest()
@@ -127,10 +127,11 @@ class JoinInvitationManager(models.Manager):
             "accept_url": accept_url,
         }
         
-        subject = render_to_string("friends/join_invite_subject.txt", ctx)
-        email_message = render_to_string("friends/join_invite_message.txt", ctx)
+        subject = render_to_string(subject_template, ctx)
+        email_message = render_to_string(message_template, ctx)
         
-        send_mail(subject, email_message, settings.DEFAULT_FROM_EMAIL, [to_email])        
+        send_mail(subject, email_message, settings.DEFAULT_FROM_EMAIL, [to_email])
+        #print "%s %s %s %s" % (subject, email_message, settings.DEFAULT_FROM_EMAIL, to_email) # fixme --- debug, pull out for prod
         return self.create(from_user=from_user, contact=contact, message=message, status="2", confirmation_key=confirmation_key)
 
 

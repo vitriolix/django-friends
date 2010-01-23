@@ -36,6 +36,7 @@ if EmailAddress:
                 raise forms.ValidationError(u"Someone with that email address is already here.")
             return self.cleaned_data["email"]
         
+        # fixme --- this does not belong in the form class
         def save(self, user):
             join_request = JoinInvitation.objects.send_invitation(user, self.cleaned_data["email"], self.cleaned_data["message"])
             user.message_set.create(message="Invitation to join sent to %s" % join_request.contact.email)
