@@ -127,11 +127,11 @@ class JoinInvitationManager(models.Manager):
             "accept_url": accept_url,
         }
         
-        subject = render_to_string(subject_template, ctx)
+        subject = render_to_string(subject_template, ctx).strip()
         email_message = render_to_string(message_template, ctx)
-        
+
+        print "%s %s %s %s" % (subject, email_message, settings.DEFAULT_FROM_EMAIL, to_email) # fixme --- debug, pull out for prod        
         send_mail(subject, email_message, settings.DEFAULT_FROM_EMAIL, [to_email])
-        #print "%s %s %s %s" % (subject, email_message, settings.DEFAULT_FROM_EMAIL, to_email) # fixme --- debug, pull out for prod
         return self.create(from_user=from_user, contact=contact, message=message, status="2", confirmation_key=confirmation_key)
 
 
